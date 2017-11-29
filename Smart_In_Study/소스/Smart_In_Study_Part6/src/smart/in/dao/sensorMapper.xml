@@ -1,0 +1,707 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "//mybatis.org//DTD Mapper 3//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- NameSpace : 패키지 안에 Interface 상속 -->
+<mapper namespace="smart.in.dao.SensorMybatis">
+	<!-- id : select 태그의 이름 parameterType : DAO부터 가져오는 값의 타입 resultType : 리턴 
+		값의 타입 -->
+	<resultMap type="dbSensorBean" id="dbSensorMap">
+		<result property="sedate" column="SE_DATE" javaType="java.lang.String" />
+		<result property="sedata" column="SE_DATA" javaType="java.lang.String" />
+		<result property="sedata2" column="SE_DATA2" javaType="java.lang.String" />
+		<result property="selog" column="SE_LOG" javaType="java.lang.String" />
+	</resultMap>
+
+	<resultMap type="dbPaymentBean" id="dbPaymentMap">
+		<result property="siscode" column="PH_SIRSISCODE" javaType="java.lang.String" />
+		<result property="sircode" column="PH_SIRCODE" javaType="java.lang.String" />
+		<result property="phdate" column="PH_DATE" javaType="java.lang.String" />
+		<result property="phenddate" column="PH_ENDDATE" javaType="java.lang.String" />
+	</resultMap>
+
+
+	<select id="select_date_range" parameterType="dbPaymentBean"
+		resultMap="dbPaymentMap">
+	<![CDATA[ 
+	SELECT PH_SIRSISCODE, PH_SIRCODE,TO_CHAR(PH_DATE,'YY/MM/DD') AS PH_DATE, TO_CHAR(PH_ENDDATE+1,'YY/MM/DD') AS PH_ENDDATE FROM PH WHERE PH_SIRSISCODE = #{siscode} AND PH_SIRCODE = #{sircode}
+	]]>
+	</select>
+	
+	<select id="select_room_code" parameterType="dbPaymentBean"
+		resultMap="dbPaymentMap">
+	<![CDATA[ 
+	SELECT SIR_CODE AS PH_SIRCODE FROM
+    (SELECT SUBSTR(SIR_CODE,0,2) AS SIR_CODE FROM SIR WHERE SIR_SISCODE = #{siscode}) GROUP BY SIR_CODE
+	]]>
+	</select>
+	
+	
+
+	<select id="sound_sensor_day" parameterType="dbPaymentBean"
+		resultMap="dbSensorMap">
+		<![CDATA[ 
+		SELECT DECODE(GROUPING(copy_t.hour_24), 0, copy_t.hour_24 || '시', '토탈') AS "SE_DATE", 
+		NVL(ROUND(AVG(SOUND.SE_DATA),3),0) AS "SE_DATA"
+		FROM   SOUND,(SELECT LPAD(ROWNUM-1, 2, '0') as hour_24 FROM dict WHERE ROWNUM <= 24) copy_t
+		WHERE SOUND.SE_DATE(+) >= #{phdate}
+  		AND SOUND.SE_DATE(+) < #{phenddate}
+  		AND copy_t.hour_24 = TO_CHAR(SOUND.SE_DATE(+), 'hh24')
+		GROUP BY (copy_t.hour_24)
+		ORDER BY copy_t.hour_24
+		]]>
+	</select>
+
+	<select id="dust_sensor_day" parameterType="dbPaymentBean"
+		resultMap="dbSensorMap">
+		<![CDATA[ 
+		SELECT DECODE(GROUPING(copy_t.hour_24), 0, copy_t.hour_24 || '시', '토탈') AS "SE_DATE", NVL(ROUND(AVG(DUST.SE_DATA),3),0) AS "SE_DATA"
+		FROM   DUST,(SELECT LPAD(ROWNUM-1, 2, '0') as hour_24 FROM dict WHERE ROWNUM <= 24) copy_t
+		WHERE DUST.SE_DATE(+) >= #{phdate}
+  		AND DUST.SE_DATE(+) <  #{phenddate}
+  		AND copy_t.hour_24 = TO_CHAR(DUST.SE_DATE(+), 'hh24')
+		GROUP BY (copy_t.hour_24)
+		ORDER BY copy_t.hour_24
+		]]>
+
+	</select>
+
+	<select id="light_sensor_day" parameterType="dbPaymentBean"
+		resultMap="dbSensorMap">
+		<![CDATA[ 
+		SELECT DECODE(GROUPING(copy_t.hour_24), 0, copy_t.hour_24 || '시', '토탈') AS "SE_DATE", 
+		NVL(ROUND(AVG(LIGHT.SE_DATA),3),0) AS "SE_DATA"
+		FROM   LIGHT,(SELECT LPAD(ROWNUM-1, 2, '0') as hour_24 FROM dict WHERE ROWNUM <= 24) copy_t
+		WHERE LIGHT.SE_DATE(+) >= #{phdate}
+  		AND LIGHT.SE_DATE(+) <  #{phenddate}
+  		AND copy_t.hour_24 = TO_CHAR(LIGHT.SE_DATE(+), 'hh24')
+		GROUP BY (copy_t.hour_24)
+		ORDER BY copy_t.hour_24
+		]]>
+	</select>
+
+	<select id="dht_sensor_day" parameterType="dbPaymentBean"
+		resultMap="dbSensorMap">
+		<![CDATA[ 
+		SELECT DECODE(GROUPING(copy_t.hour_24), 0, copy_t.hour_24 || '시', '토탈') AS "SE_DATE", 
+		NVL(ROUND(AVG(DHT.SE_DATA),3),0) AS "SE_DATA",
+		NVL(ROUND(AVG(DHT.SE_DATA2),3),0) AS "SE_DATA2"
+		FROM   DHT,(SELECT LPAD(ROWNUM-1, 2, '0') as hour_24 FROM dict WHERE ROWNUM <= 24) copy_t
+		WHERE DHT.SE_DATE(+) >= #{phdate}
+  		AND DHT.SE_DATE(+) <  #{phenddate}
+  		AND copy_t.hour_24 = TO_CHAR(DHT.SE_DATE(+), 'hh24')
+		GROUP BY (copy_t.hour_24)
+		ORDER BY copy_t.hour_24
+		]]>
+	</select>
+
+
+	<select id="ir_sensor_day" parameterType="dbPaymentBean"
+		resultMap="dbSensorMap">
+		<![CDATA[ 
+		SELECT DECODE(GROUPING(copy_t.hour_24), 0, copy_t.hour_24 || '시', '토탈') AS "SE_DATE", 
+		NVL(ROUND(AVG(IR.SE_DATA),3),0) AS "SE_DATA"
+		FROM   IR,(SELECT LPAD(ROWNUM-1, 2, '0') as hour_24 FROM dict WHERE ROWNUM <= 24) copy_t
+		WHERE IR.SE_DATE(+) >= #{phdate}
+  		AND IR.SE_DATE(+) < #{phenddate}
+  		AND copy_t.hour_24 = TO_CHAR(IR.SE_DATE(+), 'hh24')
+		GROUP BY (copy_t.hour_24)
+		ORDER BY copy_t.hour_24
+		]]>
+	</select>
+
+	<select id="hir_sensor_day" parameterType="dbPaymentBean"
+		resultMap="dbSensorMap">
+		<![CDATA[ 
+		SELECT ASD.SE_DATE AS SE_DATE, SUM(ASD.SE_DATA) AS SE_DATA FROM
+		(
+		SELECT TO_CHAR(SE_DATE,'YY/MM/DD') AS SE_DATE, SE_DATA 
+		FROM HIR 
+		WHERE SE_DATA = '1' AND SE_DATE >= #{phdate} AND SE_DATE < #{phenddate} 
+		) ASD
+		GROUP BY ASD.SE_DATE
+		HAVING ASD.SE_DATE = TRUNC(SYSDATE)
+		]]>
+	</select>
+
+	<select id="sound_sensor_month" parameterType="dbPaymentBean"
+		resultMap="dbSensorMap">
+	<![CDATA[
+	SELECT
+      	DECODE(GROUPING(copy_t.date_31), 0, copy_t.date_31 || '일') AS "SE_DATE"
+    	, NVL(ROUND(AVG(SOUND.SE_DATA),3),0) AS "SE_DATA"
+	FROM SOUND
+  		, ( SELECT LPAD(ROWNUM, 2, '0') as date_31
+    		FROM dict 
+    		WHERE ROWNUM>0 AND ROWNUM <= 31
+    		) copy_t
+	WHERE SOUND.SE_DATE(+) >= #{phdate}
+  	AND SOUND.SE_DATE(+) <  #{phenddate} 
+  	AND copy_t.date_31 = TO_CHAR(SOUND.SE_DATE(+), 'dd')
+	GROUP BY (copy_t.date_31)
+	ORDER BY copy_t.date_31
+	]]>
+	</select>
+	
+	<select id="sound_sensor_main" parameterType="dbPaymentBean"
+		resultMap="dbSensorMap">
+	<![CDATA[
+	SELECT
+      	DECODE(GROUPING(copy_t.date_31), 0, copy_t.date_31 || '일') AS "SE_DATE"
+    	, NVL(ROUND(AVG(SOUND.SE_DATA),3),0) AS "SE_DATA"
+	FROM SOUND
+  		, ( SELECT LPAD(ROWNUM, 2, '0') as date_31
+    		FROM dict 
+    		WHERE ROWNUM>0 AND ROWNUM <= 31
+    		) copy_t
+	WHERE SOUND.SE_DATE(+) >= #{phdate}
+  	AND SOUND.SE_DATE(+) <  #{phenddate} 
+  	AND SOUND.SE_SIRSISCODE = #{siscode}
+  	AND copy_t.date_31 = TO_CHAR(SOUND.SE_DATE(+), 'dd')
+	GROUP BY (copy_t.date_31)
+	ORDER BY copy_t.date_31
+	]]>
+	</select>
+
+	<select id="dust_sensor_month" parameterType="dbPaymentBean"
+		resultMap="dbSensorMap">
+		<![CDATA[
+	SELECT
+      	DECODE(GROUPING(copy_t.date_31), 0, copy_t.date_31 || '일') AS "SE_DATE"
+    	, NVL(ROUND(AVG(DUST.SE_DATA),3),0) AS "SE_DATA"
+	FROM DUST
+  		, ( SELECT LPAD(ROWNUM, 2, '0') as date_31
+    		FROM dict 
+    		WHERE ROWNUM>0 AND ROWNUM <= 31
+    		) copy_t
+	WHERE DUST.SE_DATE(+) >= #{phdate}
+  	AND DUST.SE_DATE(+) < #{phenddate} 
+  	AND copy_t.date_31 = TO_CHAR(DUST.SE_DATE(+), 'dd')
+	GROUP BY (copy_t.date_31)
+	ORDER BY copy_t.date_31
+	]]>
+	</select>
+
+	<select id="light_sensor_month" parameterType="dbPaymentBean"
+		resultMap="dbSensorMap">
+		<![CDATA[
+	SELECT
+      	DECODE(GROUPING(copy_t.date_31), 0, copy_t.date_31 || '일') AS "SE_DATE"
+    	, NVL(ROUND(AVG(LIGHT.SE_DATA),3),0) AS "SE_DATA"
+	FROM LIGHT
+  		, ( SELECT LPAD(ROWNUM, 2, '0') as date_31
+    		FROM dict 
+    		WHERE ROWNUM>0 AND ROWNUM <= 31
+    		) copy_t
+	WHERE LIGHT.SE_DATE(+) >= #{phdate}
+  	AND LIGHT.SE_DATE(+) <  #{phenddate}
+  	AND copy_t.date_31 = TO_CHAR(LIGHT.SE_DATE(+), 'dd')
+	GROUP BY (copy_t.date_31)
+	ORDER BY copy_t.date_31
+	]]>
+	</select>
+
+	<select id="dht_sensor_month" parameterType="dbPaymentBean"
+		resultMap="dbSensorMap">
+		<![CDATA[
+	SELECT
+      	DECODE(GROUPING(copy_t.date_31), 0, copy_t.date_31 || '일') AS "SE_DATE"
+    	, NVL(ROUND(AVG(DHT.SE_DATA),3),0) AS "SE_DATA"
+    	, NVL(ROUND(AVG(DHT.SE_DATA2),3),0) AS "SE_DATA2"
+	FROM DHT
+  		, ( SELECT LPAD(ROWNUM, 2, '0') as date_31
+    		FROM dict 
+    		WHERE ROWNUM>0 AND ROWNUM <= 31
+    		) copy_t
+	WHERE DHT.SE_DATE(+) >= #{phdate}
+  	AND DHT.SE_DATE(+) <  #{phenddate}
+  	AND copy_t.date_31 = TO_CHAR(DHT.SE_DATE(+), 'dd')
+	GROUP BY (copy_t.date_31)
+	ORDER BY copy_t.date_31
+	]]>
+	</select>
+	
+	<select id="dht_sensor_main" parameterType="dbPaymentBean"
+		resultMap="dbSensorMap">
+		<![CDATA[
+	SELECT
+      	DECODE(GROUPING(copy_t.date_31), 0, copy_t.date_31 || '일') AS "SE_DATE"
+    	, NVL(ROUND(AVG(DHT.SE_DATA),3),0) AS "SE_DATA"
+    	, NVL(ROUND(AVG(DHT.SE_DATA2),3),0) AS "SE_DATA2"
+	FROM DHT
+  		, ( SELECT LPAD(ROWNUM, 2, '0') as date_31
+    		FROM dict 
+    		WHERE ROWNUM>0 AND ROWNUM <= 31
+    		) copy_t
+	WHERE DHT.SE_DATE(+) >= #{phdate}
+  	AND DHT.SE_DATE(+) <  #{phenddate}
+  	AND DHT.SE_SIRSISCODE = #{siscode}
+  	AND copy_t.date_31 = TO_CHAR(DHT.SE_DATE(+), 'dd')
+	GROUP BY (copy_t.date_31)
+	ORDER BY copy_t.date_31
+	]]>
+	</select>
+
+
+
+	<select id="ir_sensor_month" parameterType="dbPaymentBean"
+		resultMap="dbSensorMap">
+		<![CDATA[
+	SELECT
+      	DECODE(GROUPING(copy_t.date_31), 0, copy_t.date_31 || '일') AS "SE_DATE"
+    	, NVL(ROUND(AVG(IR.SE_DATA),3),0) AS "SE_DATA"
+	FROM IR
+  		, ( SELECT LPAD(ROWNUM, 2, '0') as date_31
+    		FROM dict 
+    		WHERE ROWNUM>0 AND ROWNUM <= 31
+    		) copy_t
+	WHERE IR.SE_DATE(+) >= #{phdate}
+  	AND IR.SE_DATE(+) <  #{phenddate}
+  	AND copy_t.date_31 = TO_CHAR(IR.SE_DATE(+), 'dd')
+	GROUP BY (copy_t.date_31)
+	ORDER BY copy_t.date_31
+	]]>
+	</select>
+
+	<select id="hir_sensor_month" parameterType="dbPaymentBean"
+		resultMap="dbSensorMap">
+		<![CDATA[
+		SELECT ASD.SE_DATE AS SE_DATE, SUM(ASD.SE_DATA) AS SE_DATA FROM
+		(
+		SELECT TO_CHAR(SE_DATE,'YY/MM/DD') AS SE_DATE, SE_DATA 
+		FROM HIR 
+		WHERE SE_DATA = '1'
+		) ASD
+		GROUP BY ASD.SE_DATE
+		HAVING ASD.SE_DATE <= #{phenddate} AND ASD.SE_DATE >= #{phdate}
+	]]>
+	</select>
+
+	<!-- 자리별 센서 데이터 조회 -->
+
+	<select id="sound_sensor_day_personal" parameterType="dbPaymentBean"
+		resultMap="dbSensorMap">
+		<![CDATA[ 
+		SELECT DECODE(GROUPING(copy_t.hour_24), 0, copy_t.hour_24 || '시', '토탈') AS "SE_DATE", 
+		NVL(ROUND(AVG(SOUND.SE_DATA),3),0) AS "SE_DATA"
+		FROM   SOUND,(SELECT LPAD(ROWNUM-1, 2, '0') as hour_24 FROM dict WHERE ROWNUM <= 24) copy_t
+		WHERE SOUND.SE_DATE(+) >= #{phdate}
+  		AND SOUND.SE_DATE(+) <  #{phenddate}
+  		AND copy_t.hour_24 = TO_CHAR(SOUND.SE_DATE(+), 'hh24')
+  		AND SE_SIRSISCODE = #{siscode}
+  		AND SE_SIRCODE = #{sircode}
+		GROUP BY (copy_t.hour_24)
+		ORDER BY copy_t.hour_24
+		]]>
+	</select>
+
+	<select id="dust_sensor_day_personal" parameterType="dbPaymentBean"
+		resultMap="dbSensorMap">
+		<![CDATA[ 
+		SELECT DECODE(GROUPING(copy_t.hour_24), 0, copy_t.hour_24 || '시', '토탈') AS "SE_DATE", NVL(ROUND(AVG(DUST.SE_DATA),3),0) AS "SE_DATA"
+		FROM   DUST,(SELECT LPAD(ROWNUM-1, 2, '0') as hour_24 FROM dict WHERE ROWNUM <= 24) copy_t
+		WHERE DUST.SE_DATE(+) >= #{phdate}
+  		AND DUST.SE_DATE(+) <  #{phenddate}
+  		AND copy_t.hour_24 = TO_CHAR(DUST.SE_DATE(+), 'hh24')
+  		AND SE_SIRSISCODE = #{siscode}
+  		AND SE_SIRCODE = #{sircode}
+		GROUP BY (copy_t.hour_24)
+		ORDER BY copy_t.hour_24
+		]]>
+
+	</select>
+
+	<select id="light_sensor_day_personal" parameterType="dbPaymentBean"
+		resultMap="dbSensorMap">
+		<![CDATA[ 
+		SELECT DECODE(GROUPING(copy_t.hour_24), 0, copy_t.hour_24 || '시', '토탈') AS "SE_DATE", 
+		NVL(ROUND(AVG(DUST.SE_DATA),3),0) AS "SE_DATA"
+		FROM   LIGHT,(SELECT LPAD(ROWNUM-1, 2, '0') as hour_24 FROM dict WHERE ROWNUM <= 24) copy_t
+		WHERE LIGHT.SE_DATE(+) >= #{phdate}
+  		AND LIGHT.SE_DATE(+) <  #{phenddate}
+  		AND copy_t.hour_24 = TO_CHAR(LIGHT.SE_DATE(+), 'hh24')
+  		AND SE_SIRSISCODE = #{siscode}
+  		AND SE_SIRCODE = #{sircode}
+		GROUP BY (copy_t.hour_24)
+		ORDER BY copy_t.hour_24
+		]]>
+	</select>
+
+	<select id="dht_sensor_day_personal" parameterType="dbPaymentBean"
+		resultMap="dbSensorMap">
+		<![CDATA[ 
+		SELECT DECODE(GROUPING(copy_t.hour_24), 0, copy_t.hour_24 || '시', '토탈') AS "SE_DATE", 
+		NVL(ROUND(AVG(DHT.SE_DATA),3),0) AS "SE_DATA",
+		NVL(ROUND(AVG(DHT.SE_DATA2),3),0) AS "SE_DATA2"
+		FROM   DHT,(SELECT LPAD(ROWNUM-1, 2, '0') as hour_24 FROM dict WHERE ROWNUM <= 24) copy_t
+		WHERE DHT.SE_DATE(+) >=  #{phdate}
+  		AND DHT.SE_DATE(+) <  #{phenddate}
+  		AND copy_t.hour_24 = TO_CHAR(DHT.SE_DATE(+), 'hh24')
+  		AND SE_SIRSISCODE = #{siscode}
+  		AND SE_SIRCODE = #{sircode}
+		GROUP BY (copy_t.hour_24)
+		ORDER BY copy_t.hour_24
+		]]>
+	</select>
+
+	<select id="rfid_sensor_day" parameterType="dbPaymentBean"
+		resultMap="dbSensorMap">
+		<![CDATA[ 
+		SELECT A3.SE_DATE, TRUNC(SUM(A3.TIMEINT),0) AS SE_DATA FROM
+		(
+		SELECT TO_CHAR(A1.SE_DATE,'YY/MM/DD') AS SE_DATE,(A2.SE_DATE - A1.SE_DATE)*24*60 AS TIMEINT FROM 
+		(SELECT * FROM ROOMIN WHERE SE_SIRSISCODE = #{siscode} AND SE_SISCODE = #{sircode} )A1,
+		(SELECT * FROM ROOMOUT WHERE SE_SIRSISCODE =#{siscode} AND SE_SISCODE = #{sircode})A2
+		WHERE A1.RNUM1 = A2.RNUM1
+		) A3
+		GROUP BY A3.SE_DATE
+		HAVING A3.SE_DATE < #{phenddate} AND A3.SE_DATE >= #{phdate} AND A3.SE_DATE = TRUNC(SYSDATE)
+		]]>
+	</select>
+
+
+	<select id="rfid_sensor_day_not" parameterType="dbPaymentBean"
+		resultMap="dbSensorMap">
+		<![CDATA[ 
+		SELECT A3.SE_DATE AS SE_DATE, TRUNC(SUM(A3.TIMEINT),0) AS SE_DATA FROM
+		(
+		SELECT TO_CHAR(A1.SE_DATE,'YY/MM/DD') AS SE_DATE,(A2.SE_DATE - A1.SE_DATE)*24*60 AS TIMEINT FROM 
+		(SELECT * FROM ROOMINNOT WHERE SE_SIRSISCODE =#{siscode} AND SE_SISCODE = #{sircode})A1,
+		(SELECT * FROM ROOMOUT WHERE SE_SIRSISCODE = #{siscode} AND SE_SISCODE =#{sircode})A2
+		WHERE A1.RNUM1 = A2.RNUM1
+		) A3
+		GROUP BY A3.SE_DATE
+		HAVING A3.SE_DATE <  #{phenddate} AND A3.SE_DATE >= #{phdate}  AND A3.SE_DATE = TRUNC(SYSDATE)
+		]]>
+	</select>
+
+	<select id="ir_sensor_day_personal" parameterType="dbPaymentBean"
+		resultMap="dbSensorMap">
+		<![CDATA[ 
+		SELECT DECODE(GROUPING(copy_t.hour_24), 0, copy_t.hour_24 || '시', '토탈') AS "SE_DATE", 
+		NVL(ROUND(AVG(IR.SE_DATA),3),0) AS "SE_DATA"
+		FROM   IR,(SELECT LPAD(ROWNUM-1, 2, '0') as hour_24 FROM dict WHERE ROWNUM <= 24) copy_t
+		WHERE IR.SE_DATE(+) >= #{phdate}
+  		AND IR.SE_DATE(+) <  #{phenddate}
+  		AND copy_t.hour_24 = TO_CHAR(IR.SE_DATE(+), 'hh24')
+  		AND SE_SIRSISCODE = #{siscode}
+  		AND SE_SIRCODE = #{sircode}
+		GROUP BY (copy_t.hour_24)
+		ORDER BY copy_t.hour_24
+		]]>
+	</select>
+
+	<select id="hir_sensor_day_personal" parameterType="dbPaymentBean"
+		resultMap="dbSensorMap">
+		<![CDATA[ 
+		SELECT ASD.SE_DATE AS SE_DATE, SUM(ASD.SE_DATA) AS SE_DATA FROM 
+        (
+        SELECT TO_CHAR(SE_DATE,'YY/MM/DD') AS SE_DATE, SE_DATA 
+		FROM HIR 
+		WHERE SE_DATA = '1' AND SE_SIRSISCODE = #{siscode} AND SE_SIRCODE = #{sircode} 
+        ) ASD
+		GROUP BY ASD.SE_DATE
+        HAVING ASD.SE_DATE = TRUNC(SYSDATE) AND ASD.SE_DATE < #{phenddate} AND ASD.SE_DATE >= #{phdate}
+		]]>
+	</select>
+
+	<select id="sound_sensor_month_personal" parameterType="dbPaymentBean"
+		resultMap="dbSensorMap">
+	<![CDATA[
+	SELECT
+      	DECODE(GROUPING(copy_t.date_31), 0, copy_t.date_31 || '일') AS "SE_DATE"
+    	, NVL(ROUND(AVG(SOUND.SE_DATA),3),0) AS "SE_DATA"
+	FROM SOUND
+  		, ( SELECT LPAD(ROWNUM, 2, '0') as date_31
+    		FROM dict 
+    		WHERE ROWNUM>0 AND ROWNUM <= 31
+    		) copy_t
+	WHERE SOUND.SE_DATE(+) >= #{phdate}
+  	AND SOUND.SE_DATE(+) <  #{phenddate}
+  	AND copy_t.date_31 = TO_CHAR(SOUND.SE_DATE(+), 'dd')
+  	AND SE_SIRSISCODE = #{siscode}
+  	AND SE_SIRCODE = #{sircode}
+	GROUP BY (copy_t.date_31)
+	ORDER BY copy_t.date_31
+	]]>
+	</select>
+
+	<select id="dust_sensor_month_personal" parameterType="dbPaymentBean"
+		resultMap="dbSensorMap">
+		<![CDATA[
+	SELECT
+      	DECODE(GROUPING(copy_t.date_31), 0, copy_t.date_31 || '일') AS "SE_DATE"
+    	, NVL(ROUND(AVG(DUST.SE_DATA),3),0) AS "SE_DATA"
+	FROM DUST
+  		, ( SELECT LPAD(ROWNUM, 2, '0') as date_31
+    		FROM dict 
+    		WHERE ROWNUM>0 AND ROWNUM <= 31
+    		) copy_t
+	WHERE DUST.SE_DATE(+) >= #{phdate}
+  	AND DUST.SE_DATE(+) <  #{phenddate}
+  	AND copy_t.date_31 = TO_CHAR(DUST.SE_DATE(+), 'dd')
+  	AND SE_SIRSISCODE = #{siscode}
+  	AND SE_SIRCODE = #{sircode}
+	GROUP BY (copy_t.date_31)
+	ORDER BY copy_t.date_31
+	]]>
+	</select>
+
+	<select id="light_sensor_month_personal" parameterType="dbPaymentBean"
+		resultMap="dbSensorMap">
+		<![CDATA[
+	SELECT
+      	DECODE(GROUPING(copy_t.date_31), 0, copy_t.date_31 || '일') AS "SE_DATE"
+    	, NVL(ROUND(AVG(LIGHT.SE_DATA),3),0) AS "SE_DATA"
+	FROM LIGHT
+  		, ( SELECT LPAD(ROWNUM, 2, '0') as date_31
+    		FROM dict 
+    		WHERE ROWNUM>0 AND ROWNUM <= 31
+    		) copy_t
+	WHERE LIGHT.SE_DATE(+) >= #{phdate}
+  	AND LIGHT.SE_DATE(+) <  #{phenddate}
+  	AND copy_t.date_31 = TO_CHAR(LIGHT.SE_DATE(+), 'dd')
+  	AND SE_SIRSISCODE = #{siscode}
+  	AND SE_SIRCODE = #{sircode}
+	GROUP BY (copy_t.date_31)
+	ORDER BY copy_t.date_31
+	]]>
+	</select>
+
+	<select id="dht_sensor_month_personal" parameterType="dbPaymentBean"
+		resultMap="dbSensorMap">
+		<![CDATA[
+	SELECT
+      	DECODE(GROUPING(copy_t.date_31), 0, copy_t.date_31 || '일') AS "SE_DATE"
+    	, NVL(ROUND(AVG(DHT.SE_DATA),3),0) AS "SE_DATA"
+    	, NVL(ROUND(AVG(DHT.SE_DATA2),3),0) AS "SE_DATA2"
+	FROM DHT
+  		, ( SELECT LPAD(ROWNUM, 2, '0') as date_31
+    		FROM dict 
+    		WHERE ROWNUM>0 AND ROWNUM <= 31
+    		) copy_t
+	WHERE DHT.SE_DATE(+) >= #{phdate}
+  	AND DHT.SE_DATE(+) <  #{phenddate}
+  	AND copy_t.date_31 = TO_CHAR(DHT.SE_DATE(+), 'dd')
+  	AND SE_SIRSISCODE = #{siscode}
+  	AND SE_SIRCODE = #{sircode}
+	GROUP BY (copy_t.date_31)
+	ORDER BY copy_t.date_31
+	]]>
+	</select>
+
+	<select id="rfid_sensor_log_select" parameterType="dbPaymentBean"
+		resultMap="dbSensorMap">
+		<![CDATA[
+		SELECT TO_CHAR(SUM(SE_LOG)) AS SE_LOG FROM RF WHERE SE_SIRSISCODE = #{siscode} AND SE_SISCODE = #{sircode}
+		]]>
+	</select>
+
+	<select id="rfid_sensor_week" parameterType="dbPaymentBean"
+		resultMap="dbSensorMap">
+		<![CDATA[
+		SELECT A3.SE_DATE AS SE_DATE, TRUNC(SUM(A3.TIMEINT),0) AS SE_DATA FROM
+		(
+		SELECT TO_CHAR(A1.SE_DATE,'YY/MM/DD') AS SE_DATE,(A2.SE_DATE - A1.SE_DATE)*24*60 AS TIMEINT FROM 
+		(SELECT * FROM ROOMIN WHERE SE_SIRSISCODE = #{siscode} AND SE_SISCODE = #{sircode} )A1,
+		(SELECT * FROM ROOMOUT WHERE SE_SIRSISCODE = #{siscode} AND SE_SISCODE = #{sircode})A2
+		WHERE A1.RNUM1 = A2.RNUM1
+		) A3
+		GROUP BY A3.SE_DATE
+		HAVING A3.SE_DATE < #{phenddate} AND A3.SE_DATE >= #{phdate}
+	]]>
+	</select>
+
+	<select id="rfid_sensor_week_not" parameterType="dbPaymentBean"
+		resultMap="dbSensorMap">
+		<![CDATA[
+		SELECT A3.SE_DATE AS SE_DATE, TRUNC(SUM(A3.TIMEINT),0) AS SE_DATA FROM
+		(
+		SELECT TO_CHAR(A1.SE_DATE,'YY/MM/DD') AS SE_DATE,(A2.SE_DATE - A1.SE_DATE)*24*60 AS TIMEINT FROM 
+		(SELECT * FROM ROOMINNOT WHERE SE_SIRSISCODE = #{siscode} AND SE_SISCODE = #{sircode} )A1,
+		(SELECT * FROM ROOMOUT WHERE SE_SIRSISCODE = #{siscode} AND SE_SISCODE = #{sircode})A2
+		WHERE A1.RNUM1 = A2.RNUM1
+		) A3
+		GROUP BY A3.SE_DATE
+		HAVING A3.SE_DATE < #{phenddate} AND A3.SE_DATE >= #{phdate}
+	]]>
+	</select>
+
+	<select id="ir_sensor_month_personal" parameterType="dbPaymentBean"
+		resultMap="dbSensorMap">
+		<![CDATA[
+	SELECT
+      	DECODE(GROUPING(copy_t.date_31), 0, copy_t.date_31 || '일') AS "SE_DATE"
+    	, NVL(ROUND(AVG(IR.SE_DATA),3),0) AS "SE_DATA"
+	FROM IR
+  		, ( SELECT LPAD(ROWNUM, 2, '0') as date_31
+    		FROM dict 
+    		WHERE ROWNUM>0 AND ROWNUM <= 31
+    		) copy_t
+	WHERE IR.SE_DATE(+) >= #{phdate}
+  	AND IR.SE_DATE(+) <  #{phenddate}
+  	AND copy_t.date_31 = TO_CHAR(IR.SE_DATE(+), 'dd')
+  	AND SE_SIRSISCODE = #{siscode}
+  	AND SE_SIRCODE = '%'||'O0'||'%'
+	GROUP BY (copy_t.date_31)
+	ORDER BY copy_t.date_31
+	]]>
+	</select>
+
+	<select id="hir_sensor_month_personal" parameterType="dbPaymentBean"
+		resultMap="dbSensorMap">
+		<![CDATA[
+	SELECT
+      	DECODE(GROUPING(copy_t.date_31), 0, copy_t.date_31 || '일') AS "SE_DATE"
+    	, NVL(ROUND(SUM(HIR.SE_DATA),3),0) AS "SE_DATA"
+	FROM HIR
+  		, ( SELECT LPAD(ROWNUM, 2, '0') as date_31
+    		FROM dict 
+    		WHERE ROWNUM>0 AND ROWNUM <= 31
+    		) copy_t
+	WHERE HIR.SE_DATE(+) >= #{phdate}
+  	AND HIR.SE_DATE(+) <  #{phenddate}
+  	AND copy_t.date_31 = TO_CHAR(HIR.SE_DATE(+), 'dd')
+  	AND SE_SIRSISCODE = #{siscode}
+  	AND SE_SIRCODE = '%'||'O0'||'%'
+	GROUP BY (copy_t.date_31)
+	ORDER BY copy_t.date_31
+	]]>
+	</select>
+	
+	<select id="rfid_sensor_day_text" parameterType="dbPaymentBean"
+      resultMap="dbSensorMap">
+      <![CDATA[ 
+      SELECT SE_DATE, SE_LOG FROM RF WHERE SE_SIRSISCODE =#{siscode} AND SE_SISCODE = #{sircode} AND TO_CHAR(SE_DATE, 'YY/MM/DD') = TRUNC(SYSDATE)
+      ]]>
+   </select>
+
+<select id="ir_sensor_month_admin" parameterType="dbPaymentBean"
+		resultMap="dbSensorMap">
+		<![CDATA[
+	SELECT
+      	DECODE(GROUPING(copy_t.date_31), 0, copy_t.date_31 || '일') AS "SE_DATE"
+    	, NVL(ROUND(AVG(IR.SE_DATA),3),0) AS "SE_DATA"
+	FROM IR
+  		, ( SELECT LPAD(ROWNUM, 2, '0') as date_31
+    		FROM dict 
+    		WHERE ROWNUM>0 AND ROWNUM <= 31
+    		) copy_t
+	WHERE IR.SE_DATE(+) >= #{phdate}
+  	AND IR.SE_DATE(+) <  #{phenddate}
+  	AND copy_t.date_31 = TO_CHAR(IR.SE_DATE(+), 'dd')
+  	AND SE_SIRSISCODE = #{siscode}
+  	AND SE_SIRCODE LIKE '%'||'O0'||'%'
+	GROUP BY (copy_t.date_31)
+	ORDER BY copy_t.date_31
+	]]>
+	</select>
+
+	<select id="hir_sensor_month_admin" parameterType="dbPaymentBean"
+		resultMap="dbSensorMap">
+		<![CDATA[
+	SELECT
+      	DECODE(GROUPING(copy_t.date_31), 0, copy_t.date_31 || '일') AS "SE_DATE"
+    	, NVL(ROUND(SUM(HIR.SE_DATA),3),0) AS "SE_DATA"
+	FROM HIR
+  		, ( SELECT LPAD(ROWNUM, 2, '0') as date_31
+    		FROM dict 
+    		WHERE ROWNUM>0 AND ROWNUM <= 31
+    		) copy_t
+	WHERE HIR.SE_DATE(+) >= #{phdate}
+  	AND HIR.SE_DATE(+) <  #{phenddate}
+  	AND copy_t.date_31 = TO_CHAR(HIR.SE_DATE(+), 'dd')
+  	AND SE_SIRSISCODE = #{siscode}
+  	AND SE_SIRCODE LIKE '%'||'O0'||'%'
+	GROUP BY (copy_t.date_31)
+	ORDER BY copy_t.date_31
+	]]>
+	</select>
+
+
+	<select id="sound_sensor_month_admin" parameterType="dbPaymentBean"
+		resultMap="dbSensorMap">
+	<![CDATA[
+	SELECT
+      	DECODE(GROUPING(copy_t.date_31), 0, copy_t.date_31 || '일') AS "SE_DATE"
+    	, NVL(ROUND(AVG(SOUND.SE_DATA),3),0) AS "SE_DATA"
+	FROM SOUND
+  		, ( SELECT LPAD(ROWNUM, 2, '0') as date_31
+    		FROM dict 
+    		WHERE ROWNUM>0 AND ROWNUM <= 31
+    		) copy_t
+	WHERE SOUND.SE_DATE(+) >= #{phdate}
+  	AND SOUND.SE_DATE(+) <  #{phenddate}
+  	AND copy_t.date_31 = TO_CHAR(SOUND.SE_DATE(+), 'dd')
+  	AND SE_SIRSISCODE = #{siscode}
+  	AND SE_SIRCODE LIKE '%'||'O0'||'%'
+	GROUP BY (copy_t.date_31)
+	ORDER BY copy_t.date_31
+	]]>
+	</select>
+
+	<select id="dust_sensor_month_admin" parameterType="dbPaymentBean"
+		resultMap="dbSensorMap">
+		<![CDATA[
+	SELECT
+      	DECODE(GROUPING(copy_t.date_31), 0, copy_t.date_31 || '일') AS "SE_DATE"
+    	, NVL(ROUND(AVG(DUST.SE_DATA),3),0) AS "SE_DATA"
+	FROM DUST
+  		, ( SELECT LPAD(ROWNUM, 2, '0') as date_31
+    		FROM dict 
+    		WHERE ROWNUM>0 AND ROWNUM <= 31
+    		) copy_t
+	WHERE DUST.SE_DATE(+) >= #{phdate}
+  	AND DUST.SE_DATE(+) <  #{phenddate}
+  	AND copy_t.date_31 = TO_CHAR(DUST.SE_DATE(+), 'dd')
+  	AND SE_SIRSISCODE = #{siscode}
+  	AND SE_SIRCODE LIKE '%'||'O0'||'%'
+	GROUP BY (copy_t.date_31)
+	ORDER BY copy_t.date_31
+	]]>
+	</select>
+
+	<select id="light_sensor_month_admin" parameterType="dbPaymentBean"
+		resultMap="dbSensorMap">
+		<![CDATA[
+	SELECT
+      	DECODE(GROUPING(copy_t.date_31), 0, copy_t.date_31 || '일') AS "SE_DATE"
+    	, NVL(ROUND(AVG(LIGHT.SE_DATA),3),0) AS "SE_DATA"
+	FROM LIGHT
+  		, ( SELECT LPAD(ROWNUM, 2, '0') as date_31
+    		FROM dict 
+    		WHERE ROWNUM>0 AND ROWNUM <= 31
+    		) copy_t
+	WHERE LIGHT.SE_DATE(+) >= #{phdate}
+  	AND LIGHT.SE_DATE(+) <  #{phenddate}
+  	AND copy_t.date_31 = TO_CHAR(LIGHT.SE_DATE(+), 'dd')
+  	AND SE_SIRSISCODE = #{siscode}
+  	AND SE_SIRCODE LIKE '%'||'O0'||'%'
+	GROUP BY (copy_t.date_31)
+	ORDER BY copy_t.date_31
+	]]>
+	</select>
+
+	<select id="dht_sensor_month_admin" parameterType="dbPaymentBean"
+		resultMap="dbSensorMap">
+		<![CDATA[
+	SELECT
+      	DECODE(GROUPING(copy_t.date_31), 0, copy_t.date_31 || '일') AS "SE_DATE"
+    	, NVL(ROUND(AVG(DHT.SE_DATA),3),0) AS "SE_DATA"
+    	, NVL(ROUND(AVG(DHT.SE_DATA2),3),0) AS "SE_DATA2"
+	FROM DHT
+  		, ( SELECT LPAD(ROWNUM, 2, '0') as date_31
+    		FROM dict 
+    		WHERE ROWNUM>0 AND ROWNUM <= 31
+    		) copy_t
+	WHERE DHT.SE_DATE(+) >= #{phdate}
+  	AND DHT.SE_DATE(+) <  #{phenddate}
+  	AND copy_t.date_31 = TO_CHAR(DHT.SE_DATE(+), 'dd')
+  	AND SE_SIRSISCODE = #{siscode}
+  	AND SE_SIRCODE LIKE '%'||'O0'||'%'
+	GROUP BY (copy_t.date_31)
+	ORDER BY copy_t.date_31
+	]]>
+	</select>
+</mapper>

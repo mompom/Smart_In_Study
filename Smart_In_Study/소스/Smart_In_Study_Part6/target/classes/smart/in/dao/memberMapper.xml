@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "//mybatis.org//DTD Mapper 3//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- NameSpace : 패키지 안에 Interface 상속 -->
+<mapper namespace="smart.in.dao.MemberMybatis">
+	<!-- id : select 태그의 이름 parameterType : DAO부터 가져오는 값의 타입 resultType : 리턴 
+		값의 타입 -->
+
+	<!-- DB의 데이터이름과 자바 빈의 데이터 이름의 일치시켜서 적용시킴 -->
+
+	<resultMap type="dbSisBean" id="dbSisBeanMap">
+		<result property="siscode" column="SIS_CODE" javaType="java.lang.String" />
+		<result property="sisname" column="SIS_NAME" javaType="java.lang.String" />
+		<result property="sisintro" column="SIS_INTRO" javaType="java.lang.String" />
+		<result property="sisaddress" column="SIS_ADDRESS" javaType="java.lang.String" />
+		<result property="sisimg1" column="SIS_IMG1" javaType="java.lang.String" />
+		<result property="sisimg2" column="SIS_IMG2" javaType="java.lang.String" />
+		<result property="sisimg3" column="SIS_IMG3" javaType="java.lang.String" />
+		<result property="sisimg4" column="SIS_IMG4" javaType="java.lang.String" />
+		<result property="sisnumber" column="SIS_NUMBER" javaType="java.lang.String" />
+		<result property="sisphonenumber" column="SIS_PHONENUMBER"
+			javaType="java.lang.String" />
+		<result property="sisstcode" column="SIS_STCODE" javaType="java.lang.String" />
+	</resultMap>
+
+
+	<resultMap type="dbMemberBean" id="dbMemberMap">
+		<result property="mbid" column="MB_ID" javaType="java.lang.String" />
+		<result property="mbsirsiscode" column="MB_SIRSISCODE"
+			javaType="java.lang.String" />
+		<result property="mbnick" column="MB_NICK" javaType="java.lang.String" />
+		<result property="mbpw" column="MB_PW" javaType="java.lang.String" />
+		<result property="mbname" column="MB_NAME" javaType="java.lang.String" />
+		<result property="mbgender" column="MB_GENDER" javaType="java.lang.String" />
+		<result property="mbbirthday" column="MB_BIRTHDAY" javaType="java.lang.String" />
+		<result property="mbaddress" column="MB_ADDRESS" javaType="java.lang.String" />
+		<result property="mbemail" column="MB_EMAIL" javaType="java.lang.String" />
+		<result property="mbsircode" column="MB_SIRCODE" javaType="java.lang.String" />
+		<result property="mbphonenumber" column="MB_PHONENUMBER"
+			javaType="java.lang.String" />
+		<result property="himbid" column="HI_MBID" javaType="java.lang.String" />
+		<result property="histcode" column="HI_STCODE" javaType="java.lang.String" />
+		<result property="hidate" column="HI_DATE" javaType="java.lang.String" />
+		<result property="hisiscode" column="HI_MBSIRSISCODE" javaType="java.lang.String" />
+		<result property="sisname" column="SIS_NAME" javaType="java.lang.String" />
+	</resultMap>
+	
+	<resultMap type="dbPaymentBean" id="dbPaymentMap">
+		<result property="mbid" column="PH_MBID" javaType="java.lang.String" />
+		<result property="siscode" column="PH_SIRSISCODE" javaType="java.lang.String" />
+		<result property="sircode" column="PH_SIRCODE" javaType="java.lang.String" />
+		<result property="price" column="PH_PRICE" javaType="java.lang.String" />
+		<result property="phdate" column="PH_DATE" javaType="java.lang.String" />
+		<result property="phenddate" column="PH_ENDDATE" javaType="java.lang.String" />
+		<result property="phaccountid" column="PH_ACCOUNTID" javaType="java.lang.String" />
+	</resultMap>
+
+	<insert id="join" parameterType="memberBean">
+		INSERT INTO MB
+		VALUES(#{mbid},#{siscode},#{mbnick},#{mbpw},#{mbname},#{mbgender},#{mbbirthday},#{mbaddress},#{mbemail},'M1','X',#{mbphonenumber})
+	</insert>
+
+	<insert id="login" parameterType="memberBean">
+		INSERT INTO HI
+		VALUES(#{siscode}, #{mbid}, DEFAULT , 'L1')
+	</insert>
+
+	<insert id="changePw" parameterType="memberBean">
+		UPDATE MB SET
+		MB_PW=#{mbpw}
+		WHERE MB_ID =#{mbid} AND MB_SIRSISCODE =#{siscode}
+	</insert>
+
+	<select id="pwCheck" parameterType="memberBean" resultType="dbMemberBean">
+		SELECT MB_PW AS mbpw FROM MB WHERE MB_ID=#{mbid} AND
+		MB_SIRSISCODE=#{siscode}
+	</select>
+
+	<select id="mainPage" parameterType="sisBean" resultMap="dbSisBeanMap">
+		SELECT *
+		FROM SIS WHERE SIS_CODE =#{siscode}
+	</select>
+
+	<select id="selectLocation" parameterType="sisBean" resultMap="dbSisBeanMap">
+		SELECT * FROM SIS WHERE SIS_CODE LIKE '%'||'#{siscode}'||'%'
+	</select>
+
+	<insert id="changeNick" parameterType="memberBean">
+		UPDATE MB SET
+		MB_NICK=#{mbnick} WHERE MB_ID =#{mbid} AND MB_SIRSISCODE =#{siscode}
+	</insert>
+
+	<select id="infoPage" parameterType="memberBean" resultMap="dbMemberMap">
+		SELECT * FROM MB WHERE MB_ID=#{mbid} AND MB_SIRSISCODE =#{siscode}
+	</select>
+
+	<insert id="changeEmail" parameterType="memberBean">
+		UPDATE MB SET
+		MB_EMAIL=#{mbemail} WHERE MB_ID =#{mbid} AND MB_SIRSISCODE =#{siscode}
+	</insert>
+
+	<insert id="changeAdd" parameterType="memberBean">
+		UPDATE MB SET
+		MB_ADDRESS=#{mbaddress} WHERE MB_ID =#{mbid} AND MB_SIRSISCODE
+		=#{siscode}
+	</insert>
+
+	<select id="profilePage" parameterType="memberBean" resultMap="dbMemberMap">
+		SELECT * FROM MB WHERE MB_ID=#{mbid} AND MB_SIRSISCODE =#{siscode}
+	</select>
+
+	<select id="contactPage" parameterType="memberBean" resultMap="dbMemberMap">
+		SELECT * FROM MB WHERE MB_ID=#{mbid} AND MB_SIRSISCODE =#{siscode}
+	</select>
+	<!-- <select id="inOutHistory" parameterType="sensorBean" resultType="dbSensorBean"> 
+		</select> -->
+
+	<select id="loginHistory" parameterType="memberBean" resultMap="dbMemberMap">
+		SELECT HI_MBID,
+		TO_CHAR(HI_DATE, 'YYYY-MM-DD HH24:MI:SS')AS HI_DATE,
+		HI_STCODE
+		FROM HI WHERE HI_MBID =
+		#{mbid} AND HI_MBSIRSISCODE =#{siscode}
+		ORDER BY HI_DATE DESC
+	</select>
+
+	<insert id="logout" parameterType="memberBean">
+		INSERT INTO HI
+		VALUES(#{siscode} ,
+		#{mbid} , DEFAULT , 'L0')
+	</insert>
+
+	<select id="locationCheck" parameterType="memberBean"
+		resultType="java.lang.Integer">
+		SELECT COUNT(*) FROM MB WHERE MB_ID = #{mbid}
+		AND
+		MB_SIRSISCODE = #{siscode}
+	</select>
+
+	<insert id="request_service" parameterType="requestBean">
+		INSERT INTO RS
+		VALUES(#{rsname},#{rsphonenumber},#{rsaddress},#{rscontent},'R0',#{rssequnce},SYSDATE)
+	</insert>
+
+	<!-- 프렌차이즈 요청 맵 -->
+	<resultMap type="dbRequestBean" id="dbRequestMap">
+		<result property="rsname" column="RS_NAME" javaType="java.lang.String" />
+		<result property="rsphonenumber" column="RS_PHONENUMBER"
+			javaType="java.lang.String" />
+		<result property="rsaddress" column="RS_ADDRESS" javaType="java.lang.String" />
+		<result property="rscontent" column="RS_CONTENT" javaType="java.lang.String" />
+		<result property="rsstname" column="ST_NAME" javaType="java.lang.String" />
+		<result property="rssequence" column="RS_SEQUENCE" javaType="java.lang.Integer" />
+	</resultMap>
+
+	<select id="request_Sequnce_find" parameterType="requestBean"
+		resultType="dbRequestBean">
+		SELECT RS_SEQUENCE AS rssequence FROM
+		(SELECT * FROM RS
+		WHERE RS_NAME=#{rsname} AND RS_PHONENUMBER=#{rsphonenumber} ORDER BY
+		RS_SEQUENCE DESC)
+		WHERE ROWNUM = 1
+	</select>
+
+
+	<select id="request_find_service" parameterType="requestBean"
+		resultMap="dbRequestMap">
+		SELECT RS_SEQUENCE, RS_NAME, RS_PHONENUMBER, RS_ADDRESS,
+		RS_CONTENT,
+		ST_CODE, ST_NAME
+		FROM RS
+		INNER JOIN ST
+		ON ST.ST_CODE =
+		RS.RS_STCODE
+		WHERE
+		RS_NAME = #{rsname} AND RS_PHONENUMBER =
+		#{rsphonenumber}
+		ORDER BY RS_SEQUENCE
+	</select>
+	<!-- End 프렌차이즈 요청 맵 -->
+
+	<!-- 결제 -->
+	<insert id="account" parameterType="paymentBean">
+		<![CDATA[ INSERT INTO PH
+		VALUES(#{phaccountid},#{siscode},#{sircode},#{mbid},#{approvalnumber},#{phdate},#{phdate}+#{paymentdate},#{price})]]>
+	</insert>
+
+	<!-- 회원의 자리등록 -->
+	<insert id="set_sir" parameterType="paymentBean">
+		UPDATE MB SET
+		MB_SIRCODE=#{sircode}
+		WHERE MB_ID =#{mbid} AND MB_SIRSISCODE
+		=#{siscode}
+	</insert>
+
+	<!-- 아이디 찾기 -->
+	<select id="idFind" parameterType="memberBean" resultMap="dbMemberMap">
+		SELECT
+		SIS_NAME, MB_ID FROM MB
+		INNER JOIN SIS
+		ON SIS.SIS_CODE = MB_SIRSISCODE
+		WHERE MB_NAME=#{mbname} AND MB_EMAIL=#{mbemail} AND
+		MB_SIRSISCODE=#{siscode}
+	</select>
+
+	<!-- 아이디, 휴대폰번호, 독서실코드 일치여부 확인 -->
+	<select id="idPhoneCheck" parameterType="memberBean" resultType="java.lang.Integer">
+		SELECT
+		COUNT(*) FROM MB WHERE MB_ID=#{mbid} AND
+		MB_SIRSISCODE=#{siscode}
+		AND MB_PHONENUMBER=#{mbphonenumber}
+	</select>
+
+
+	<!-- 아이디, 이메일, 독서실코드 일치여부 확인 -->
+	<select id="idEmailCheck" parameterType="memberBean" resultType="java.lang.Integer">
+		SELECT
+		COUNT(*) FROM MB WHERE MB_ID=#{mbid} AND
+		MB_SIRSISCODE=#{siscode}
+		AND MB_EMAIL=#{mbemail}
+	</select>
+
+	<!-- siscode에 해당하는 독서실명 출력 -->
+	<select id="sisCodeToName" parameterType="Map" resultType="String">
+		SELECT SIS_NAME AS sisname FROM SIS WHERE SIS_CODE=#{siscode}
+	</select>
+
+	<!-- 이름, 아이디, 이메일, 독서실코드 일치여부 확인 -->
+	<select id="nameIdEmailCheck" parameterType="memberBean"
+		resultType="java.lang.Integer">
+		SELECT COUNT(*)
+		FROM MB
+		WHERE MB_NAME=#{mbname} AND
+		MB_EMAIL=#{mbemail} AND
+		MB_ID=#{mbid}
+		AND MB_SIRSISCODE=#{siscode}
+	</select>
+
+	<!-- 결제에 필요한 데이터 출력 -->
+	<select id="mbinfo_payment" parameterType="memberBean" resultType="dbMemberBean">
+		SELECT MB_EMAIL AS mbemail, MB_PHONENUMBER AS mbphonenumber, MB_NAME
+		AS mbname, MB_ADDRESS as mbaddress FROM MB WHERE MB_ID=#{mbid} AND
+		MB_SIRSISCODE =#{siscode}
+	</select>
+	
+	<!-- 결제 금액 출력 -->
+	<select id="sirpriceCheck" parameterType="memberBean" resultType="dbMemberBean">
+		SELECT SIR_PRICE AS SIRPRICE FROM SIR WHERE SIR_SISCODE =#{siscode} AND
+		SIR_CODE = #{sircode}
+	</select>
+	
+	<!-- 결제완료 페이지 이동 -->
+	<select id="paymentPage" parameterType="paymentBean" resultMap="dbPaymentMap">
+		SELECT PH_ACCOUNTID, PH_SIRSISCODE, PH_SIRCODE
+		, PH_MBID ,  TO_CHAR(PH_DATE, 'YYYY-MM-DD HH24:MI:SS'),TO_CHAR(PH_ENDDATE, 'YYYY-MM-DD HH24:MI:SS'), PH_PRICE FROM PH WHERE PH_MBID=#{mbid} AND
+		PH_SIRSISCODE =#{siscode} AND PH_SIRCODE =#{sircode}
+	</select>
+	
+	<!-- 자리 중복 체크 -->
+	<select id="sircodeCheck" parameterType="memberBean" resultType="java.lang.Integer">
+		SELECT COUNT(*) FROM MB WHERE MB_SIRSISCODE=#{siscode} AND MB_SIRCODE=#{sircode}
+	</select>
+	
+	<!-- 결제 중복 체크 -->
+	<select id="paymentCheck" parameterType="memberBean" resultType="java.lang.Integer">
+		SELECT COUNT(*) FROM MB WHERE MB_SIRSISCODE=#{siscode} AND MB_SIRCODE='X' AND MB_ID = #{mbid}
+	</select>
+	
+	<!-- 자리 등록 체크 -->
+	<select id="accountCheck" parameterType="memberBean" resultType="java.lang.Integer">
+		SELECT COUNT(*) FROM PH WHERE PH_MBID = #{mbid} AND PH_SIRSISCODE = #{siscode} AND TO_CHAR(PH_DATE, 'YY/MM/DD') = TRUNC(SYSDATE)
+	</select>
+	
+	<!-- 자리 등록 -->
+	<select id="sircode" parameterType="memberBean" resultType="dbMemberBean">
+		SELECT MB_SIRCODE AS sircode FROM MB WHERE MB_ID = #{mbid} AND MB_SIRSISCODE = #{siscode}
+	</select>
+	
+	<!-- 자리 기간 종료 -->
+	<insert id="delsircode" parameterType="memberBean">
+		UPDATE MB SET MB_SIRCODE = 'X' WHERE (
+SELECT PH_SIRCODE AS MB_SIRCODE FROM PH WHERE PH_SIRSISCODE = #{siscode} AND TO_CHAR(PH_ENDDATE, 'YY/MM/DD') = TRUNC(SYSDATE)
+) = MB.MB_SIRCODE
+	</insert>
+
+	
+	<!-- 비밀번호 변경 -->
+	<insert id="changePhoneNumber" parameterType="memberBean">
+		UPDATE MB SET
+		MB_PHONENUMBER=#{mbphonenumber}
+		WHERE MB_ID =#{mbid} AND MB_SIRSISCODE =#{siscode}
+	</insert>
+
+	 
+</mapper>

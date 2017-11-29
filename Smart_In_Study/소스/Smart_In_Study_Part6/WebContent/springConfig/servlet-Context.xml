@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/mvc"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<!-- DispatcherServlet Context: defines this servlet's request-processing 
+		infrastructure -->
+	<!-- Enables the Spring MVC @Controller programming model -->
+	<annotation-driven />
+
+	<!-- 해당 폴더에 쉽게 접근하고 폴더위치를 보안하기 위한 경로 설정 ** : 해당 폴더 내의 모든 파일 -->
+	<resources mapping="/css/**" location="/views/css/" />
+	<resources mapping="/js/**" location="/views/js/" />
+	<resources mapping="/images/**" location="/views/images/" />
+	<resources mapping="/style/**" location="/views/style/" />
+	<resources mapping="/views/**" location="/views/" />
+
+
+	<beans:bean id="multipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<!-- max upload size in bytes -->
+		<beans:property name="maxUploadSize" value="5242880" /> <!-- 5MB -->
+		<!-- max size of file in memory (in bytes) -->
+		<beans:property name="maxInMemorySize" value="1048576" /> <!-- 1MB -->
+	</beans:bean>
+
+	<!-- Resolves views selected for rendering by @Controllers to .jsp resources 
+		in the /WEB-INF/views directory -->
+	<!-- 해당 프로젝트의 웹페이지 위치 설정하고 웹페이지 파일의 확장자명 선정 -->
+	<beans:bean
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<beans:property name="prefix" value="/views/" />
+		<beans:property name="suffix" value=".jsp" />
+	</beans:bean>
+	<!-- 컨트롤러 클래스의 패키지 명 -->
+	<context:component-scan base-package="smart.in.*" />
+
+	<!-- Session Interceptor -->
+<!-- 	<interceptors>
+		<interceptor>
+			<mapping path="/*" />
+			<exclude-mapping path="/" />
+			<exclude-mapping path="/Main_Login_Admin" />
+			<exclude-mapping path="/Main_Login_Admin" />
+			<beans:bean class="smart.in.utils.SessionInterceptor"></beans:bean>
+		</interceptor>
+	</interceptors> -->
+	<!-- 스프링의 파일업로드 기능을 사용하기 위한 리졸버 설정 추가 되지 않으면 MultiPartHttpServletRequest를 
+		사용할 수 없다고 에외발생 -->
+
+
+
+
+
+</beans:beans>

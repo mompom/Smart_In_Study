@@ -1,0 +1,403 @@
+@charset "UTF-8";
+
+/*  Footer Css  */
+.content {
+	flex: 1 0 auto;
+	-webkit-flex: 1 0 auto;
+	min-height: 200px;
+}
+// remove the active class if it's there
+#myFooter {
+	flex: 0 0 auto;
+	-webkit-flex: 0 0 auto;
+}
+
+#map {
+	height: 240px;
+	width: 100%;
+	margin-top: 30px;
+	margin-bottom: 10px;
+}
+
+#myFooter {
+	background-color: #222;
+	color: white;
+	padding-top: 20px;
+}
+
+#myFooter .row {
+	margin: 0 85px;
+}
+
+#myFooter .footer-copyright {
+	background-color: #222;
+	padding-top: 20px;
+	padding-bottom: 20px;
+	text-align: center;
+}
+
+#myFooter .footer-copyright p {
+	margin: 10px;
+	color: #ccc;
+}
+
+#myFooter .container {
+	width: auto;
+}
+
+#myFooter ul {
+	list-style-type: none;
+	padding-left: 0;
+	line-height: 1.7;
+}
+
+#myFooter h5 {
+	font-size: 18px;
+	color: white;
+	font-weight: bold;
+	margin-top: 30px;
+	color: #f05f40;
+}
+
+#myFooter a {
+	color: #d2d1d1;
+	text-decoration: none;
+}
+
+#myFooter a:hover, #myFooter a:focus {
+	text-decoration: none;
+	color: white;
+}
+
+#myFooter .social-networks {
+	text-align: center;
+	padding-top: 30px;
+	padding-bottom: 38px;
+}
+
+#myFooter .fa {
+	font-size: 30px;
+	margin-right: 15px;
+	margin-left: 20px;
+	background-color: white;
+	color: #182c39;
+	border-radius: 51%;
+	padding: 10px;
+	height: 50px;
+	width: 50px;
+	text-align: center;
+	line-height: 31px;
+	text-decoration: none;
+	transition: color 0.2s;
+}
+
+#myFooter .fa-facebook:hover {
+	color: #2b55ff;
+}
+
+#myFooter .fa-facebook:focus {
+	color: #2b55ff;
+}
+
+#myFooter .fa-google-plus:hover {
+	color: red;
+}
+
+#myFooter .fa-google-plus:focus {
+	color: red;
+}
+
+#myFooter .fa-twitter:hover {
+	color: #00aced;
+}
+
+#myFooter .fa-twitter:focus {
+	color: #00aced;
+}
+
+@media screen and (max-width: 767px) {
+	#myFooter {
+		text-align: center;
+	}
+	#myFooter .row {
+		margin: 0;
+	}
+}
+
+/* Google Map */
+.customoverlay {
+	position: relative;
+	bottom: 85px;
+	border-radius: 6px;
+	border: 1px solid #ccc;
+	border-bottom: 2px solid #ddd;
+	float: left;
+	font-family: 'Helvetica Neue', Arial, sans-serif;
+	color: #222;
+}
+
+.customoverlay:nth-of-type(n) {
+	border: 0;
+	box-shadow: 0px 1px 2px #888;
+}
+
+.customoverlay a {
+	display: block;
+	text-decoration: none;
+	color: #222;
+	text-align: center;
+	font-size: 12px;
+	font-weight: Bold;
+	overflow: hidden;
+	background: #fff;
+	background: #f05f40
+		url(http://t1.daumcdn.net/localimg/localimages/07/mapapidoc/arrow_white.png)
+		no-repeat right 14px center;
+	border-radius: 10px;
+}
+
+.customoverlay .title {
+	display: block;
+	text-align: center;
+	background: #fff;
+	margin-right: 35px;
+	padding: 10px 15px;
+	font-size: 14px;
+	font-weight: bold;
+	color: #222;
+}
+
+.customoverlay .title2 {
+	height: 18px;
+	display: block;
+	text-decoration: none;
+	color: #222;
+	text-align: center;
+	margin-right: 35px;
+	font-size: 12px;
+	font-weight: Bold;
+	overflow: hidden;
+	background: #fff;
+	font-family: 'NanumSquareRound'
+}
+
+.customoverlay:after {
+	content: '';
+	position: absolute;
+	margin-left: -12px;
+	left: 50%;
+	bottom: -12px;
+	width: 22px;
+	height: 12px;
+	background:
+		url('http://t1.daumcdn.net/localimg/localimages/07/mapapidoc/vertex_white.png')
+}
+
+/* 구글 맵 트래커*/
+.node {
+	position: absolute;
+	background-image:
+		url(http://t1.daumcdn.net/localimg/localimages/07/mapapidoc/sign-info-64.png);
+	cursor: pointer;
+	width: 64px;
+	height: 64px;
+}
+
+.tooltip {
+	background-color: #fff;
+	position: absolute;
+	border: 2px solid #333;
+	font-size: 25px;
+	font-weight: bold;
+	padding: 3px 5px 0;
+	left: 65px;
+	top: 14px;
+	border-radius: 5px;
+	white-space: nowrap;
+	display: none;
+}
+
+.tracker {
+	position: absolute;
+	margin: -35px 0 0 -30px;
+	display: none;
+	cursor: pointer;
+	z-index: 3;
+}
+
+.icon {
+	position: absolute;
+	left: 6px;
+	top: 9px;
+	width: 48px;
+	height: 48px;
+	background-image:
+		url(http://t1.daumcdn.net/localimg/localimages/07/mapapidoc/sign-info-48.png);
+}
+
+.balloon {
+	position: absolute;
+	width: 60px;
+	height: 60px;
+	background-image:
+		url(http://t1.daumcdn.net/localimg/localimages/07/mapapidoc/balloon.png);
+	-ms-transform-origin: 50% 34px;
+	-webkit-transform-origin: 50% 34px;
+	transform-origin: 50% 34px;
+}
+
+#bo_cate {
+	width: 100%;
+	display: inline-block;
+	list-style: none;
+}
+
+#bo_cate ul {
+	margin-bottom: 10px;
+	padding-left: 1px;
+	zoom: 1;
+	list-style: none;
+}
+
+#bo_cate ul:after {
+	display: block;
+	visibility: hidden;
+	clear: both;
+	content: "";
+}
+
+#bo_cate li {
+	float: left;
+	margin-bottom: -1px;
+	width: 10%;
+	list-style: none;
+}
+
+#bo_cate a {
+	display: block;
+	position: relative;
+	margin-left: -1px;
+	padding: 10px 0;
+	border: 1px solid #ddd;
+	color: #888;
+	text-align: center;
+	letter-spacing: -0.1em;
+	line-height: 1.2em;
+	cursor: pointer
+}
+
+#bo_cate a:focus, #bo_cate a:hover, #bo_cate a:active {
+	text-decoration: none
+}
+
+#bo_cate .pyj {
+	z-index: 2;
+	border: 1px solid #ffb244;
+	background: #fff;
+	color: #ffb244;
+	font-weight: bold
+}
+
+#bo_cate_ul {
+	margin: 0 15px;
+}
+
+<
+style>#bo_cate {
+	width: 100%;
+	display: inline-block;
+}
+
+#bo_cate ul {
+	margin-bottom: 10px;
+	padding-left: 1px;
+	zoom: 1;
+	list-style: none;
+}
+
+#bo_cate ul:after {
+	display: block;
+	visibility: hidden;
+	clear: both;
+	content: "";
+}
+
+#bo_cate li {
+	float: left;
+	margin-bottom: -1px;
+	width: 10%;
+	list-style: none;
+}
+
+#bo_cate a {
+	display: block;
+	position: relative;
+	margin-left: -1px;
+	padding: 10px 0;
+	border: 1px solid #ddd;
+	color: #888;
+	text-align: center;
+	letter-spacing: -0.1em;
+	line-height: 1.2em;
+	cursor: pointer
+}
+
+#bo_cate a:focus, #bo_cate a:hover, #bo_cate a:active {
+	text-decoration: none
+}
+
+#bo_cate .pyj {
+	z-index: 2;
+	border: 1px solid #ffb244;
+	background: #fff;
+	color: #ffb244;
+	font-weight: bold
+}
+
+#bo_cate_ul {
+	margin: 0 15px;
+}
+
+
+/****************/
+
+
+
+
+#footer_span {
+  color: #666;
+  font-size: 12px;
+  display: block;
+  position: absolute;
+  bottom: 10px;
+  position: absolute;
+  width: 90%;
+  left: 50%;
+  top: 45%;
+  bottom: auto;
+  right: auto;
+  transform: translateX(-50%) translateY(-50%);
+  text-align: center;
+}
+#footer_span a {
+  color: #000000;
+  text-decoration: none;
+}
+#footer_span .fa {
+  color: #E90606;
+  margin: 0 3px;
+  font-size: 10px;
+  animation: pound 0.35s infinite alternate;
+  -webkit-animation: pound 0.35s infinite alternate;
+}
+
+@-webkit-keyframes pound {
+  to {
+    transform: scale(1.1);
+  }
+}
+@keyframes pound {
+  to {
+    transform: scale(1.1);
+  }
+}

@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "//mybatis.org//DTD Mapper 3//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- NameSpace : 패키지 안에 Interface 상속 -->
+<mapper namespace="smart.in.dao.AdminMybatis">
+	<!-- id : select 태그의 이름 parameterType : DAO부터 가져오는 값의 타입 resultType : 리턴 
+		값의 타입 -->
+
+	<!-- DB의 데이터이름과 자바 빈의 데이터 이름의 일치시켜서 적용시킴 -->
+	<resultMap type="dbSisBean" id="dbSisBeanMap2">
+		<result property="siscode" column="SIS_CODE" javaType="java.lang.String" />
+		<result property="sisname" column="SIS_NAME" javaType="java.lang.String" />
+		<result property="sisimg1" column="SIS_IMG1" javaType="java.lang.String" />
+		<result property="sircode" column="SIR_CODE" javaType="java.lang.String" />
+		<result property="sirprice" column="SIR_PRICE" javaType="java.lang.String" />
+	</resultMap>
+
+	<resultMap type="dbRequestBean" id="dbRequestBeanMap">
+		<result property="rsdate" column="RS_DATE" javaType="java.lang.String" />
+		<result property="rsname" column="RS_NAME" javaType="java.lang.String" />
+		<result property="rsphonenumber" column="RS_PHONENUMBER"
+			javaType="java.lang.String" />
+		<result property="rsaddress" column="RS_ADDRESS" javaType="java.lang.String" />
+		<result property="rscontent" column="RS_CONTENT" javaType="java.lang.String" />
+		<result property="rsstname" column="ST_NAME" javaType="java.lang.String" />
+	</resultMap>
+
+	<resultMap type="dbMemberBean" id="dbMemberMap">
+		<result property="mbid" column="MB_ID" javaType="java.lang.String" />
+		<result property="mbnick" column="MB_NICK" javaType="java.lang.String" />
+		<result property="mbname" column="MB_NAME" javaType="java.lang.String" />
+		<result property="mbgender" column="MB_GENDER" javaType="java.lang.String" />
+		<result property="sircode" column="MB_SIRCODE" javaType="java.lang.String" />
+	</resultMap>
+
+	<!-- 메인페이지 호출 또는 전체 지역 선택 (프렌차이즈본점 제외) -->
+	<select id="mainSisAll" resultMap="dbSisBeanMap2">
+		SELECT SIS_NAME, SIS_CODE,
+		SIS_IMG1 FROM SIS WHERE SIS_CODE!='SisAdmin'
+	</select>
+
+	<!-- 메인페이지에서 지역 선택 -->
+	<select id="mainSisLocation" parameterType="sisBean" resultMap="dbSisBeanMap2">
+		SELECT SIS_NAME, SIS_CODE, SIS_IMG1 FROM SIS WHERE SIS_CODE LIKE '%'||
+		#{siscode} ||'%'
+	</select>
+
+	<!-- 최종관리자의 프렌차이즈 전체 요청 확인 -->
+	<select id="request_kind" parameterType="requestBean" resultMap="dbRequestBeanMap">
+		SELECT
+		TO_CHAR(RS_DATE,'YYYY-MM-dd HH:mm:ss') AS RS_DATE , RS_NAME,
+		RS_PHONENUMBER, RS_ADDRESS,
+		RS_CONTENT, ST_CODE,
+		ST_NAME FROM RS
+		INNER
+		JOIN ST
+		ON ST.ST_CODE =
+		RS_STCODE
+		WHERE RS_STCODE =#{rsstcode}
+		ORDER BY
+		RS_DATE
+	</select>
+
+
+	<!-- siscode에 해당하는 최근 siscode 호출 -->
+	<select id="sisCode_find" parameterType="sisBean" resultType="java.lang.String">
+		SELECT SIS_CODE FROM SIS WHERE SIS_CODE LIKE '%'|| #{siscode} ||'%'
+		AND rownum=1 ORDER BY SIS_CODE DESC
+	</select>
+
+	<insert id="sisSetup" parameterType="Map">
+		INSERT INTO SIS
+		VALUES(#{siscode},#{sisname},'독서실 소개글을
+		등록해주세요.',#{sisaddress},'comingsoon.jpg','comingsoon.jpg','comingsoon.jpg','comingsoon.jpg',null,#{sisphonenumber},'R1')
+	</insert>
+
+	<update id="request_update" parameterType="Map">
+		UPDATE RS SET
+		RS_STCODE='R1' WHERE RS_ADDRESS=#{rsaddress} AND
+		RS_PHONENUMBER=#{rsphonenumber}
+	</update>
+
+	<update id="request_address_update" parameterType="Map">
+		UPDATE RS SET
+		RS_ADDRESS=#{rsaddress2} WHERE RS_ADDRESS=#{rsaddress} AND
+		RS_PHONENUMBER=#{rsphonenumber}
+	</update>
+
+	<insert id="sisRoomSetup" parameterType="Map">
+		INSERT INTO SIR
+		VALUES(#{siscode},#{roomType},DEFAULT)
+	</insert>
+
+	<insert id="sisSeetSetup" parameterType="Map">
+		INSERT INTO SIR
+		VALUES(#{siscode},#{seetType},DEFAULT)
+	</insert>
+
+	<insert id="sisjoin" parameterType="memberBean">
+		INSERT INTO MB
+		VALUES(#{mbid},#{siscode},#{mbid},#{mbpw},'이름','성별','생년월일',#{mbaddress},'개인
+		이메일','M0','X',#{mbphonenumber})
+	</insert>
+
+	<!-- 독서실 등록 -->
+	<update id="sis_register" parameterType="sisBean">
+		UPDATE SIS SET
+		SIS_NAME=#{sisname}, SIS_INTRO=#{sisintro},
+		SIS_IMG1=#{sisimg1},
+		SIS_IMG2=#{sisimg2}, SIS_IMG3=#{sisimg3},
+		SIS_IMG4=#{sisimg4},
+		SIS_NUMBER=#{sisnumber},
+		SIS_PHONENUMBER=#{sisphonenumber},
+		SIS_STCODE='R2' WHERE
+		SIS_CODE=#{siscode}
+	</update>
+	<!-- 독서실 자리 가격 등록 -->
+	<update id="sis_sir_register" parameterType="sisBean">
+		UPDATE SIR SET
+		SIR_PRICE=#{sirprice} WHERE SIR_SISCODE=#{siscode} AND SIR_CODE LIKE
+		'%'||#{sircode}||'%'
+	</update>
+	<!-- 독서실 요청 오픈으로 변경 -->
+	<update id="sis_rs_register" parameterType="sisBean">
+		UPDATE RS SET
+		RS_STCODE='R2' WHERE RS_PHONENUMBER=#{sisphonenumber} AND
+		RS_ADDRESS=#{sisaddress}
+	</update>
+
+	<!-- 독서실 자리정보 호출 -->
+	<select id="sis_managementPage_sir" parameterType="sisBean"
+		resultMap="dbSisBeanMap2">
+		SELECT SIR_CODE, SIR_PRICE FROM SIR WHERE
+		SIR_SISCODE=#{siscode} AND SIR_CODE LIKE '%'||#{sircode}||'%'
+	</select>
+
+	<!-- 독서실 회원 정보 호출 -->
+	<select id="sis_managementPage_mb" parameterType="sisBean"
+		resultMap="dbMemberMap">
+		SELECT MB_ID, MB_NICK, MB_NAME, MB_GENDER, MB_SIRCODE FROM
+		MB WHERE MB_SIRSISCODE=#{siscode}
+	</select>
+	<!-- 독서실 정보 호출 -->
+	<select id="sis_managementPage_sis" parameterType="sisBean"
+		resultType="dbSisBean">
+		SELECT SIS_CODE AS siscode, SIS_NAME AS sisname, SIS_INTRO
+		AS sisintro, SIS_ADDRESS AS sisaddress, SIS_PHONENUMBER AS
+		sisphonenumber, SIS_STCODE AS sisstcode, SIS_NUMBER AS sisnumber
+		FROM
+		SIS WHERE SIS_CODE
+		=#{siscode}
+	</select>
+
+	<!-- Img1 변경 -->
+	<update id="sis_admin_changeMain_img1" parameterType="sisBean">
+		UPDATE SIS
+		SET SIS_IMG1=#{sisimg1} WHERE SIS_CODE=#{siscode}
+	</update>
+
+	<!-- Img2 변경 -->
+	<update id="sis_admin_changeMain_img2" parameterType="sisBean">
+		UPDATE SIS
+		SET SIS_IMG2=#{sisimg1} WHERE SIS_CODE=#{siscode}
+	</update>
+
+	<!-- Img3 변경 -->
+	<update id="sis_admin_changeMain_img3" parameterType="sisBean">
+		UPDATE SIS
+		SET SIS_IMG3=#{sisimg1} WHERE SIS_CODE=#{siscode}
+	</update>
+
+	<!-- Img4 변경 -->
+	<update id="sis_admin_changeMain_img4" parameterType="sisBean">
+		UPDATE SIS
+		SET SIS_IMG4=#{sisimg1} WHERE SIS_CODE=#{siscode}
+	</update>
+
+	<!-- 독서실 소개 수정 -->
+	<update id="sis_admin_changeMain_intro" parameterType="sisBean">
+		UPDATE SIS
+		SET SIS_INTRO=#{sisintro} WHERE SIS_CODE=#{siscode}
+	</update>
+
+	<!-- 독서실 담당자 번호 수정 -->
+	<update id="sis_admin_changeMain_phonenumber" parameterType="sisBean">
+		UPDATE SIS SET SIS_PHONENUMBER=#{sisphonenumber} WHERE
+		SIS_CODE=#{siscode}
+	</update>
+
+	<!-- 매출 -->
+	<select id="sales" parameterType="paymentBean" resultType="dbPaymentBean">
+		SELECT PH_SIRCODE AS sircode ,PH_MBID AS mbid, PH_DATE AS phdate ,PH_ENDDATE AS phenddate,PH_PRICE AS price FROM PH WHERE PH_SIRSISCODE = #{siscode}
+	</select>
+	
+	<!-- 자리체크 -->
+	<select id="sis_admin_sircheck" parameterType="memberBean" resultType="dbPaymentBean">
+		SELECT PH_MBID AS mbid, PH_DATE AS startdate,PH_ENDDATE AS phenddate,PH_PRICE AS price FROM PH WHERE PH_SIRSISCODE = #{siscode} AND PH_SIRCODE = #{sircode}
+	</select>
+	
+	<!-- 입퇴실 체크 -->
+	<select id="inoutcheck" parameterType="memberBean" resultType="dbSensorBean">
+	SELECT SE_LOG AS selog FROM RF WHERE SE_DATE = (SELECT MAX(SE_DATE) FROM RF WHERE SE_SIRSISCODE = #{siscode} AND SE_SISCODE = #{sircode})
+	</select>
+</mapper>

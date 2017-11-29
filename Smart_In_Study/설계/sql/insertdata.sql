@@ -1,0 +1,85 @@
+INSERT INTO STATUS VALUES('L0','로그오프');
+INSERT INTO STATUS VALUES('L1','로그인');
+INSERT INTO STATUS VALUES('M0','관리자');
+INSERT INTO STATUS VALUES('M1','일반회원');
+INSERT INTO STATUS VALUES('R0','신청중');
+INSERT INTO STATUS VALUES('R1','오픈예정');
+INSERT INTO STATUS VALUES('R3','오픈');
+INSERT INTO STATUS VALUES('M7','Master');
+SELECT * FROM ST;
+
+INSERT INTO MB VALUES('SisAdmin','SisAdmin','Master','$2a$10$zSRWghVht7GDTyW5s/ThRup8/BxKbd08ogqYywoE5a9ZW0ceCJYni','본점','남자','19950309','인천 남구 매소홀로488번길 6-32 (학익동) 태승빌딩 5층','p950309@naver.com','M7','X','01041641659');
+
+INSERT INTO MB VALUES('p950309','SUN0000001','Hwanseok','1q2w3e4r','박환석','남자','19950309','인천 남구 용현동 인주대로 224번길 14 신성오피스텔 204호','p950309@naver.com','M1','X','01041641659');
+INSERT INTO MB VALUES('mompom','SEO0000001','joinpark','1q2w3e4r','박유진','남자','19991225','인천 남구 주안동 태영빌라 402호','mompom@google.com','M1','X','01062917715');
+INSERT INTO MB VALUES('eungi','ICN0000001','Eungi','1q2w3e4r','황은기','여자','19940225','경기도 부천 역곡동','eungi@google.com','M1','X','01033081345');
+INSERT INTO MB VALUES('sisadmin','ICN0000001','helloWorld','1q2w3e4r','관리자','남자','19920225','인천광역시 남구 매소홀로488번길 6-32 태승빌딩 5층','smartinstudy@google.com','M0','X','01022742809');
+INSERT INTO MB VALUES('sisadmin','SEO0000001','helloWorld','1q2w3e4r','관리자','남자','19920225','서울특별시 강남구 압구정로79길 41','smartinstudy@google.com','M0','X','01022742809');
+INSERT INTO MB VALUES('sisadmin','SUN0000001','helloWorld','1q2w3e4r','관리자','남자','19920225','전라남도 순천시 조례동 922-2 순천마트 4층','smartinstudy@google.com','M0','X','01022742809');
+INSERT INTO SIS VALUES('SisAdmin','Smart In Study 본점','인천 남구에 위치한 Smart In Study 본점','인천광역시 남구 매소홀로488번길 6-32 태승빌딩 5층',',jpg','.jpg','.jpg','.jpg','032-876-3332','01022742809');
+
+select * from MB;
+
+--1인실(독립형), 오픈형 열람실, 그룹스터디룸
+SELECT * FROM SIS;
+INSERT INTO SIS VALUES('SisAdmin','Smart In Study 본점','인천 남구에 위치한 Smart In Study 본점','인천광역시 남구 매소홀로488번길 6-32 태승빌딩 5층',',jpg','.jpg','.jpg','.jpg','032-876-3332','01022742809');
+
+INSERT INTO SIS VALUES('ICN0000001','Smart In Study 인천점','인천 남구에 위치한 깨끗한 독서실입니다.','인천광역시 남구 매소홀로488번길 6-32 태승빌딩 5층','1ICN0000001.jpg','2ICN0000001.jpg','3ICN0000001.jpg','4ICN0000001.jpg','032-876-3332','01022742809');
+INSERT INTO SIS VALUES('SEO0000001','Smart In Study 서울점','서울 강남에 위치한 조용한 독서실입니다.','서울특별시 강남구 압구정로79길 41','1SEO0000001.jpg','2SEO0000001.jpg','3SEO0000001.jpg','4SEO0000001.jpg','02-3438-2300','01062917715');
+INSERT INTO SIS VALUES('SUN0000001','Smart In Study 순천점','순천 조례동에 위치한 모두가 아닌 당신만의 독서실입니다.','전라남도 순천시 조례동 922-2 순천마트 4층','1SEO0000001.jpg','2SUN0000001.jpg','3SUN0000001.jpg','4SUN0000001.jpg','061-724-6116','01041641659');
+
+SELECT FROM SIR;
+SELECT FROM SIR WHERE SIR_SISCODE='ICN0000001';
+SELECT FROM SIR WHERE SIR_SISCODE='SEO0000001';
+SELECT FROM SIR WHERE SIR_SISCODE='SUN0000001';
+
+SELECT SE_DATE, SE_DATA, SE_LOG FROM RFID WHERE SE_SIRSISCODE='ICN0000001' ;
+
+INSERT INTO SIR VALUES('SisAdmin','X','없음');
+INSERT INTO SIR VALUES('ICN0000001','X','없음');
+INSERT INTO SIR VALUES('SEO0000001','X','없음');
+INSERT INTO SIR VALUES('SUN0000001','X','없음');
+INSERT INTO SIR VALUES('ICN0000001','O0','1인실');
+INSERT INTO SIR VALUES('ICN0000001','O1','1인실 1자리');
+INSERT INTO SIR VALUES('ICN0000001','O2','1인실 2자리');
+INSERT INTO SIR VALUES('ICN0000001','O3','1인실 3자리');
+
+INSERT INTO SIR VALUES('SEO0000001','O0','1인실');
+INSERT INTO SIR VALUES('SEO0000001','O1','1인실 1자리');
+INSERT INTO SIR VALUES('SEO0000001','O2','1인실 2자리');
+INSERT INTO SIR VALUES('SEO0000001','O3','1인실 3자리');
+
+INSERT INTO SIR VALUES('SUN0000001','O0','1인실');
+INSERT INTO SIR VALUES('SUN0000001','O1','1인실 1자리');
+INSERT INTO SIR VALUES('SUN0000001','O2','1인실 2자리');
+INSERT INTO SIR VALUES('SUN0000001','O3','1인실 3자리');
+
+INSERT INTO SIR VALUES('ICN0000001','P0','오픈형 열람실');
+INSERT INTO SIR VALUES('ICN0000001','P1','오픈형 열람실 1자리');
+INSERT INTO SIR VALUES('ICN0000001','P2','오픈형 열람실 2자리');
+INSERT INTO SIR VALUES('ICN0000001','P3','오픈형 열람실 3자리');
+
+INSERT INTO SIR VALUES('SEO0000001','P0','오픈형 열람실');
+INSERT INTO SIR VALUES('SEO0000001','P1','오픈형 열람실 1자리');
+INSERT INTO SIR VALUES('SEO0000001','P2','오픈형 열람실 2자리');
+INSERT INTO SIR VALUES('SEO0000001','P3','오픈형 열람실 3자리');
+
+INSERT INTO SIR VALUES('SUN0000001','P0','오픈형 열람실');
+INSERT INTO SIR VALUES('SUN0000001','P1','오픈형 열람실 1자리');
+INSERT INTO SIR VALUES('SUN0000001','P2','오픈형 열람실 2자리');
+INSERT INTO SIR VALUES('SUN0000001','P3','오픈형 열람실 3자리');
+
+INSERT INTO SIR VALUES('ICN0000001','G0','그룹스터디룸');
+INSERT INTO SIR VALUES('ICN0000001','G1','그룹스터디룸 1자리');
+INSERT INTO SIR VALUES('ICN0000001','G2','그룹스터디룸 2자리');
+INSERT INTO SIR VALUES('ICN0000001','G3','그룹스터디룸 3자리');
+
+INSERT INTO SIR VALUES('SEO0000001','G0','그룹스터디룸');
+INSERT INTO SIR VALUES('SEO0000001','G1','그룹스터디룸 1자리');
+INSERT INTO SIR VALUES('SEO0000001','G2','그룹스터디룸 2자리');
+INSERT INTO SIR VALUES('SEO0000001','G3','그룹스터디룸 3자리');
+
+INSERT INTO SIR VALUES('SUN0000001','G0','그룹스터디룸');
+INSERT INTO SIR VALUES('SUN0000001','G1','그룹스터디룸 1자리');
+INSERT INTO SIR VALUES('SUN0000001','G2','그룹스터디룸 2자리');
+INSERT INTO SIR VALUES('SUN0000001','G3','그룹스터디룸 3자리');

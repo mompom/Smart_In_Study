@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "//mybatis.org//DTD Config 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+
+<configuration>
+
+	<!-- bean Alias 지정 -->
+	<typeAliases>
+		<!-- typeAlias -->
+		<!-- 해당 패키지에 Alias 권한 부여 -->
+		<package name="smart.in.beans" />
+
+		<!-- alias와 일치한 경로 지정 -->
+		<!-- <typeAlias alias="test" type="phs.dynamic.beans.MemberBean"/> -->
+
+	</typeAliases>
+
+	<!-- Date Type 변환 -->
+	<typeHandlers>
+		<typeHandler javaType="java.util.Date"
+			handler="org.apache.ibatis.type.DateTypeHandler" />
+	</typeHandlers>
+
+
+	<!-- 적용될 mapper.xml 지정 -->
+	<mappers>
+		<mapper resource="/smart/in/dao/memberMapper.xml" />
+		<mapper resource="/smart/in/dao/adminMapper.xml" />
+		<mapper resource="/smart/in/dao/sensorMapper.xml" />
+	</mappers>
+</configuration>
